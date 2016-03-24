@@ -4,7 +4,7 @@
     "parameters": {
         "artifactsBaseUrl": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/intel-lustre-clients-on-centos",
+            "defaultValue": "https://raw.githubusercontent.com/grandparoach/master/lustre_clients",
             "metadata": {
                 "description": "Base URL of the solution template gallery package",
                 "artifactsBaseUrl": ""
@@ -84,13 +84,6 @@
                 "description": "Globally unique DNS name prefix name must be between 3 and 50 characters long and can contain only dashes, numbers, and lowercase letters. The domain name suffix (e.g. westus.cloudapp.zure.com) will be automatically updated based on the selected location."
             }
         },
-        "clientAvailabilitySetName": {
-            "type": "string",
-            "defaultValue": "availset-lustre-clients",
-            "metadata": {
-                "description": "Lustre clients availability set name is important for grouping clients into deployments that can communicate with each other via RDMA"
-            }
-        },
         "vmNamePrefix": {
             "type": "string",
             "defaultValue": "lustre",
@@ -119,6 +112,13 @@
                 "Standard_DS12",
                 "Standard_DS13",
                 "Standard_DS14",
+                "Standard_D2_v2",
+                "Standard_D3_v2",
+                "Standard_D4_v2",
+                "Standard_D11_v2",
+                "Standard_D12_v2",
+                "Standard_D13_v2",
+                "Standard_D14_v2",
                 "Standard_G1",
                 "Standard_G2",
                 "Standard_G3",
@@ -145,7 +145,6 @@
         "clientCount": {
             "type": "int",
             "defaultValue": 2,
-            "allowedValues": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50 ],
             "metadata": {
                 "description": "Number of Lustre clients"
             }
@@ -205,11 +204,6 @@
     "variables": {
         "imagePublisher": "openlogic",
         "imageOffer": "CentOS",
-        "clientAvailabilitySetSettings": {
-            "name": "[concat(parameters('clientAvailabilitySetName'))]",
-            "faultDomainCount": "3",
-            "updateDomainCount": "5"
-        },
         "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
         "vnetID": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks', parameters('existingVnetName'))]",
         "subnetClientsID": "[concat(variables('vnetID'), '/subnets/', parameters('existingSubnetClientsName'))]",
@@ -237,16 +231,6 @@
             "location": "[parameters('location')]",
             "properties": {
                 "accountType": "[parameters('storageAccountType')]"
-            }
-        },
-        {
-            "apiVersion": "2015-05-01-preview",
-            "type": "Microsoft.Compute/availabilitySets",
-            "name": "[variables('clientAvailabilitySetSettings').name]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "platformFaultDomainCount": "[variables('clientAvailabilitySetSettings').faultDomainCount]",
-                "platformUpdateDomainCount": "[variables('clientAvailabilitySetSettings').updateDomainCount]"
             }
         },
         {
@@ -317,7 +301,6 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountPrefix'))]",
-                "[concat('Microsoft.Compute/availabilitySets/', variables('clientAvailabilitySetSettings').name)]",
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('vmNamePrefix'), 'client', copyIndex())]"
             ],
             "copy": {
@@ -328,9 +311,6 @@
                 "LustreType": "client"
             },
             "properties": {
-                "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('clientAvailabilitySetSettings').name)]"
-                },
                 "hardwareProfile": {
                     "vmSize": "[parameters('clientVmSize')]"
                 },
