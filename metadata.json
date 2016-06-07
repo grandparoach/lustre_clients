@@ -1,5 +1,5 @@
 {
-  "itemDisplayName": "Intel Lustre clients using CentOS gallery image",
+  "itemDisplayName": "lustre_clients",
   "description": "This template creates multiple Intel Lustre 2.7 client virtual machines using Azure gallery OpenLogic CentOS 6.6 or 7.0 images and mounts an existing Intel Lustre filesystem",
   "summary": "Multiple Intel Lustre clients with mount of an existing Lustre filesystem",
   "githubUsername": "grandparoach",
