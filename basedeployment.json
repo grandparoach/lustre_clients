@@ -53,11 +53,8 @@
     "existingSubnetClientsName": {
       "type": "string"
     },
-    "storageAccountPrefix": {
+    "storageAccountName": {
       "type": "string"
-    },
-    "numberofstorageAccounts": {
-      "type": "int"
     }
   },
   "variables": {
