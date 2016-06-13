@@ -122,7 +122,7 @@
       "name": "[concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), parameters('clusterIndex'), client0')]"
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0')]"
       ],
       "properties": {
         "ipConfigurations": [
