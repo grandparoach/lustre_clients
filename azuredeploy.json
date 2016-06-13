@@ -232,6 +232,9 @@
       "name": "[concat('clusterSet', copyindex())]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
+      "dependsOn": [ 
+         "[concat('Microsoft.Compute/availabilitySets/', parameters('clientAvailabilitySetName'))]" 
+      ], 
       "copy": {
         "name": "deploymentLoop",
         "count": "[parameters('numberOfStorageAccounts')]"
