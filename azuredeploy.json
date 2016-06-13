@@ -229,19 +229,6 @@
       }
     },
     {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('storageAccountNamePrefix'), padLeft(copyindex(), 2, '0'), 'sa')]",
-      "apiVersion": "2015-06-15",
-      "copy": {
-        "name": "storageLoop",
-        "count": "[parameters('numberOfStorageAccounts')]"
-      },
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "accountType": "[parameters('storageAccountType')]"
-      }
-    },
-    {
       "name": "[concat('clusterSet', copyindex())]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
@@ -249,9 +236,6 @@
         "name": "deploymentLoop",
         "count": "[parameters('numberOfStorageAccounts')]"
       },
-      "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountNamePrefix'), padLeft(copyindex(), 2, '0'), 'sa')]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -276,6 +260,7 @@
           "existingVnetName": { "value": "[parameters('existingVnetName')]"},
           "existingSubnetClientsName": { "value": "[parameters('existingSubnetClientsName')]"},
           "storageAccountName": { "value": "[concat(variables('storageAccountNamePrefix'), padLeft(copyindex(), 2, '0'), 'sa')]"},
+          "storageAccountType": { "value": "[parameters('storageAccountType')]"},
           "clusterIndex": { "value": "[concat(padLeft(copyindex(), 2, '0'))]" }
         }
       }
