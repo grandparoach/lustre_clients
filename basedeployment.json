@@ -53,6 +53,9 @@
     "storageAccountName": {
       "type": "string"
     },
+    "storageAccountType": {
+      "type": "string"
+    },
     "clusterIndex": {
       "type": "string"
     }
