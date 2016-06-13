@@ -183,7 +183,6 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-        "[concat('Microsoft.Compute/availabilitySets/', parameters('clientAvailabilitySetName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', parameters('vmNamePrefix'), parameters('clusterIndex'), 'client', copyIndex())]"
       ],
       "copy": {
