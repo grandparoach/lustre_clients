@@ -124,7 +124,7 @@
         "publicIPAllocationMethod": "Dynamic",
         "idleTimeoutInMinutes": 4,
         "dnsSettings": {
-          "domainNameLabel": "[concat(parameters('dnsNamePrefix'),'')]"
+          "domainNameLabel": "[concat(parameters('dnsNamePrefix'), parameters('clusterIndex'), '')]"
         }
       }
     },
