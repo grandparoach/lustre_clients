@@ -224,12 +224,8 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('storageAccountName'), padLeft(copyindex(), 2, '0'))]",
+      "name": "[concat(variables('storageAccountName'), '00')]",
       "location": "[resourceGroup().location]",
-      "copy": {
-        "name": "storageLoop",
-        "count": "[add(div(parameters('clientCount'), 40), 1)]"
-      },
       "properties": {
         "accountType": "[parameters('storageAccountType')]"
       }
@@ -269,7 +265,7 @@
       "name": "[concat(parameters('vmNamePrefix'), '020')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [  
-        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'), padLeft(mod(copyindex(1), add(div(parameters('clientCount'), 40), 1)), 2, '0'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'), '00' )]",
         "[concat('Microsoft.Compute/availabilitySets/', variables('clientAvailabilitySetSettings').name)]",
         "[concat('Microsoft.Network/networkInterfaces/', parameters('vmNamePrefix'), 'nic020')]"
       ],
@@ -294,7 +290,7 @@
           "osDisk": {
             "name": "osdisk",
             "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'), padLeft(mod(copyindex(1), add(div(parameters('clientCount'), 40), 1)), 2, '0')), '2015-06-15').primaryEndpoints.blob, 'vhds-client/', concat(parameters('vmNamePrefix'), '020'), '-osdisk.vhd')]"
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'), '00'), '2015-06-15').primaryEndpoints.blob, 'vhds-client/', concat(parameters('vmNamePrefix'), '020'), '-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
