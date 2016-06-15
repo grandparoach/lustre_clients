@@ -117,34 +117,15 @@
     },
     {
       "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "idleTimeoutInMinutes": 4,
-        "dnsSettings": {
-          "domainNameLabel": "[concat(parameters('dnsNamePrefix'), parameters('clusterIndex'), '')]"
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0')]",
       "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0')]"
-      ],
       "properties": {
         "ipConfigurations": [
           {
             "name": "ip1",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0'))]"
-              },
               "subnet": {
                 "id": "[variables('subnetClientsID')]"
               }
@@ -224,41 +205,8 @@
           ]
         }
       }
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client', copyIndex(), '/init')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client',copyIndex()))]"
-      ],
-      "copy": {
-        "name": "clientExtensionsCopy",
-        "count": "[parameters('clientCount')]"
-      },
-      "properties": {
-        "publisher": "Microsoft.OSTCExtensions",
-        "type": "CustomScriptForLinux",
-        "typeHandlerVersion": "1.5",
-        "settings": {
-          "fileUris": [
-            "[variables('scriptUrlLustreClient')]"
-          ],
-          "commandToExecute": "[concat('bash lustre_client.sh', ' -n ', parameters('image'), ' -i ', copyIndex(), ' -d 0', ' -m ', parameters('mgsIpAddress'), ' -l ', reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client', copyIndex()))).ipConfigurations[0].properties.privateIPAddress, ' -f ', parameters('filesystemName'))]"
-        }
-      }
     }
-  ],
-  "outputs": {
-    "client0DomainName": {
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmNamePrefix'), parameters('clusterIndex'), 'client0'))).dnsSettings.fqdn]",
-      "metadata": {
-        "description": "SSH to the client0 node using this public IP address and run command mount to see all mount points"
-      }
-    }
-  }
+  ]
 }
 
 
