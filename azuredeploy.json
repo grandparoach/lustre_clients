@@ -6,7 +6,8 @@
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/intel-lustre-clients-on-centos",
       "metadata": {
-        "description": "Base URL of the solution template gallery package"
+        "description": "Base URL of the solution template gallery package",
+        "artifactsBaseUrl": ""
       }
     },
     "image": {
@@ -58,6 +59,12 @@
       "defaultValue": "availset-lustre-clients",
       "metadata": {
         "description": "Lustre clients availability set name is important for grouping clients into deployments that can communicate with each other via RDMA"
+      }
+    },
+    "dnsNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Globally unique DNS name prefix name must be between 3 and 50 characters long and can contain only dashes, numbers, and lowercase letters. The domain name suffix (e.g. westus.cloudapp.zure.com) will be automatically updated based on the selected location."
       }
     },
     "vmNamePrefix": {
@@ -268,7 +275,7 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(parameters('vmNamePrefix'),'000')]",
+      "name": "[concat(parameters('vmNamePrefix'),'IP000')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -284,7 +291,7 @@
       "name": "[concat(parameters('vmNamePrefix'), 'nic000')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), '000')]"
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), 'IP000')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -293,7 +300,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), '000'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), 'IP000'))]"
               },
               "subnet": {
                 "id": "[variables('subnetClientsID')]"
@@ -396,7 +403,7 @@
           "fileUris": [
             "[variables('scriptUrlLustreClient')]"
           ],
-          "commandToExecute": "[concat('bash lustre_client.sh', ' -n ', parameters('image'), ' -i ', padLeft(copyindex(), 3, '0'), ' -d 0', ' -m ', parameters('mgsIpAddress'), ' -l ', reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNamePrefix'), padLeft(copyindex(), 3, '0')))).ipConfigurations[0].properties.privateIPAddress, ' -f ', parameters('filesystemName'))]"
+          "commandToExecute": "[concat('bash lustre_client.sh', ' -n ', parameters('image'), ' -i ', padLeft(copyindex(), 3, '0'), ' -d 0', ' -m ', parameters('mgsIpAddress'), ' -l ', reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNamePrefix'), 'nic', padLeft(copyindex(), 3, '0')))).ipConfigurations[0].properties.privateIPAddress, ' -f ', parameters('filesystemName'))]"
         }
       }
     }
@@ -404,13 +411,11 @@
   "outputs": {
     "client0DomainName": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmNamePrefix'),'000'))).dnsSettings.fqdn]",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmNamePrefix'),'IP000'))).dnsSettings.fqdn]",
       "metadata": {
         "description": "SSH to the client0 node using this public IP address and run command mount to see all mount points"
       }
     }
   }
 }
-
-
 
