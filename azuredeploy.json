@@ -177,7 +177,7 @@
     },
     "existingVnetResourceGroupName": {
       "type": "string",
-      "defaultValue": "lustre",
+      "defaultValue": "Lustre_Servers",
       "metadata": {
         "description": "Existing Virtual Network Resource Group where Lustre servers are deployed"
       }
