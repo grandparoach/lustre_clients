@@ -4,7 +4,7 @@
   "parameters": {
     "artifactsBaseUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/intel-lustre-clients-on-centos",
+      "defaultValue": "https://raw.githubusercontent.com/grandparoach/lustre_clients/NFS_option/",
       "metadata": {
         "description": "Base URL of the solution template gallery package",
         "artifactsBaseUrl": ""
@@ -150,20 +150,6 @@
         "description": "Number of Lustre clients"
       }
     },
-    "filesystemName": {
-      "type": "string",
-      "defaultValue": "scratch",
-      "metadata": {
-        "description": "Name of the Lustre filesystem exposed by the Lustre MGS node"
-      }
-    },
-    "mgsIpAddress": {
-      "type": "string",
-      "defaultValue": "10.1.0.4",
-      "metadata": {
-        "description": "IP address of the Lustre MGS node"
-      }
-    },
     "storageAccountType": {
       "type": "string",
       "defaultValue": "Standard_LRS",
@@ -232,7 +218,7 @@
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "vnetID": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks', parameters('existingVnetName'))]",
     "subnetClientsID": "[concat(variables('vnetID'), '/subnets/', parameters('existingSubnetClientsName'))]",
-    "scriptUrlLustreClient": "[concat(variables('baseUrl'),'lustre_client.sh')]",
+    "finaldeployScriptURI": "[concat(variables('baseUrl'),'finaldeploy.sh')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "linuxConfiguration_sshPublicKey": {
       "disablePasswordAuthentication": "true",
@@ -400,11 +386,11 @@
         "type": "CustomScriptForLinux",
         "typeHandlerVersion": "1.5",
         "settings": {
-          "fileUris": [
-            "[variables('scriptUrlLustreClient')]"
-          ],
-          "commandToExecute": "[concat('bash lustre_client.sh', ' -n ', parameters('image'), ' -i ', padLeft(copyindex(), 3, '0'), ' -d 0', ' -m ', parameters('mgsIpAddress'), ' -l ', reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNamePrefix'), 'nic', padLeft(copyindex(), 3, '0')))).ipConfigurations[0].properties.privateIPAddress, ' -f ', parameters('filesystemName'))]"
+          "fileUris": [ "[variables('finaldeployScriptURI')]"
+           ],
+          "commandToExecute": "[concat('bash finaldeploy.sh',' ', parameters('masterHostName'),' ', parameters('hpcUserName'))]"
         }
+
       }
     }
   ],
