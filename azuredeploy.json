@@ -161,6 +161,14 @@
         "description": "Storage account type (e.g. Premium_LRS or Standard_LRS). Make sure to select Premium_LRS only when using DS-series or GS-series Virtual Machines."
       }
     },
+    "masterHostName": {
+      "type": "string",
+      "defaultValue": "transfernfs2vm"
+    },
+    "hpcUserName": {
+      "type": "string",
+      "defaultValue": "hpc"
+    },
     "existingVnetResourceGroupName": {
       "type": "string",
       "defaultValue": "Lustre_Servers",
