@@ -278,7 +278,7 @@
         "settings": {
           "fileUris": [ "[variables('finaldeployScriptURI')]"
            ],
-          "commandToExecute": "[concat('bash finaldeploy.sh',' ', parameters('masterHostName'))]"
+          "commandToExecute": "[concat('bash finaldeploy.sh',' ', parameters('masterHostName'),' ', parameters('adminUsername'))]"
         }
 
       }
