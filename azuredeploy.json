@@ -85,30 +85,30 @@
       "type": "int",
       "defaultValue": 2,
       "metadata": {
-        "description": "Number of Lustre clients"
+        "description": "Number of clients"
       }
     },
     "masterHostName": {
       "type": "string",
-      "defaultValue": "transfernfs2vm"
+      "defaultValue": ""
     },
     "existingVnetResourceGroupName": {
       "type": "string",
-      "defaultValue": "Lustre_Servers",
+      "defaultValue": "",
       "metadata": {
         "description": "Existing Virtual Network Resource Group where Lustre servers are deployed"
       }
     },
     "existingVnetName": {
       "type": "string",
-      "defaultValue": "vnet-lustre",
+      "defaultValue": "",
       "metadata": {
         "description": "Existing Virtual Network name (e.g. vnet-lustre)"
       }
     },
     "existingSubnetClientsName": {
       "type": "string",
-      "defaultValue": "subnet-lustre-clients",
+      "defaultValue": "",
       "metadata": {
         "description": "Lustre clients will be deployed into this subnet within the existing Virtual Network"
       }
