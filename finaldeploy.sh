@@ -2,83 +2,47 @@
 
 MASTER_HOSTNAME=$1
 
-# Shares
-SHARE_HOME=/share/home
-SHARE_DATA=/share/data
+USER=$2
+yum install -y -q nfs-utils
+mkdir -p /mnt/nfsshare
+mkdir -p /mnt/resource/scratch
+chmod 777 /mnt/nfsshare
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start rpcbind
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+localip=`hostname -i | cut --delimiter='.' -f -3`
+echo "$MASTER_HOSTNAME:/mnt/nfsshare    /mnt/nfsshare   nfs defaults 0 0" | tee -a /etc/fstab
+echo "$MASTER_HOSTNAME:/mnt/resource/scratch    /mnt/resource/scratch   nfs defaults 0 0" | tee -a /etc/fstab
 
+mount -a
 
-# Hpc User
-HPC_USER=$2
-HPC_UID=7007
-HPC_GROUP=hpc
-HPC_GID=7007
-
-
-# Installs all required packages.
-#
-install_pkgs()
-{
-    pkgs="zlib zlib-devel bzip2 bzip2-devel bzip2-libs openssl openssl-devel openssl-libs gcc gcc-c++ nfs-utils rpcbind mdadm wget"
-    yum -y install $pkgs
-}
-
-
-setup_shares()
-{
-    mkdir -p $SHARE_HOME
-    mkdir -p $SHARE_DATA
-
-   
-        echo "$MASTER_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
-        echo "$MASTER_HOSTNAME:$SHARE_DATA $SHARE_DATA    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
-        mount -a
-        mount | grep "^$MASTER_HOSTNAME:$SHARE_HOME"
-        mount | grep "^$MASTER_HOSTNAME:$SHARE_DATA"
-
-}
-
-# Adds a common HPC user to the node and configures public key SSh auth.
-# The HPC user has a shared home directory (NFS share on master) and access
-# to the data share.
-#
-setup_hpc_user()
-{
-    # disable selinux
-    sed -i 's/enforcing/disabled/g' /etc/selinux/config
-    setenforce permissive
+# Don't require password for HPC user sudo
+echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
     
-    groupadd -g $HPC_GID $HPC_GROUP
+# Disable tty requirement for sudo
+sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
 
-    # Don't require password for HPC user sudo
-    echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    
-    # Disable tty requirement for sudo
-    sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
+ln -s /opt/intel/impi/5.1.3.181/intel64/bin/ /opt/intel/impi/5.1.3.181/bin
+ln -s /opt/intel/impi/5.1.3.181/lib64/ /opt/intel/impi/5.1.3.181/lib
+chown -R $USER:$USER /mnt/resource/
 
-    
-    useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
-    
-}
+df
+
+
+
 
 # Sets all common environment variables and system parameters.
 #
-setup_env()
-{
-    # Set unlimited mem lock
-    echo "$HPC_USER hard memlock unlimited" >> /etc/security/limits.conf
-    echo "$HPC_USER soft memlock unlimited" >> /etc/security/limits.conf
 
     # Intel MPI config for IB
     echo "# IB Config for MPI" > /etc/profile.d/hpc.sh
     echo "export I_MPI_FABRICS=shm:dapl" >> /etc/profile.d/hpc.sh
     echo "export I_MPI_DAPL_PROVIDER=ofa-v2-ib0" >> /etc/profile.d/hpc.sh
     echo "export I_MPI_DYNAMIC_CONNECTION=0" >> /etc/profile.d/hpc.sh
-}
-
-install_pkgs
-setup_shares
-setup_hpc_user
-setup_env
-
 
 
