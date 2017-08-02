@@ -60,13 +60,7 @@
       "metadata": {
         "description": "Lustre clients availability set name is important for grouping clients into deployments that can communicate with each other via RDMA"
       }
-    },
-    "dnsNamePrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Globally unique DNS name prefix name must be between 3 and 50 characters long and can contain only dashes, numbers, and lowercase letters. The domain name suffix (e.g. westus.cloudapp.zure.com) will be automatically updated based on the selected location."
-      }
-    },
+    }
     "vmNamePrefix": {
       "type": "string",
       "defaultValue": "hpcn",
@@ -76,11 +70,12 @@
     },
     "clientVmSize": {
       "type": "string",
-      "defaultValue": "Standard_A9",
+      "defaultValue": "Standard_H16r",
       "metadata": {
         "description": "Size of the Lustre client VM"
       },
       "allowedValues": [
+        "Standard_H16r",
         "Standard_D2",
         "Standard_D3",
         "Standard_D4",
@@ -274,24 +269,10 @@
     },
     {
       "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(parameters('vmNamePrefix'),'IP000')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "idleTimeoutInMinutes": 4,
-        "dnsSettings": {
-          "domainNameLabel": "[concat(parameters('dnsNamePrefix'),'')]"
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('vmNamePrefix'), 'nic000')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), 'IP000')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -299,9 +280,6 @@
             "name": "ip1",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), 'IP000'))]"
-              },
               "subnet": {
                 "id": "[variables('subnetClientsID')]"
               }
@@ -407,15 +385,6 @@
         }
       }
     }
-  ],
-  "outputs": {
-    "client0DomainName": {
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmNamePrefix'),'IP000'))).dnsSettings.fqdn]",
-      "metadata": {
-        "description": "SSH to the client0 node using this public IP address and run command mount to see all mount points"
-      }
-    }
-  }
+  ]
 }
 
