@@ -60,7 +60,7 @@
       "metadata": {
         "description": "Lustre clients availability set name is important for grouping clients into deployments that can communicate with each other via RDMA"
       }
-    }
+    },
     "vmNamePrefix": {
       "type": "string",
       "defaultValue": "hpcn",
