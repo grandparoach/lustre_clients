@@ -13,4 +13,4 @@ templates for deploying Lustre clients for more than 40 machines
 Based on the templates by Arsen Vladimirskiy from this repository:
 https://github.com/Azure/azure-quickstart-templates/tree/master/intel-lustre-clients-on-centos 
 
-Added multiple Storage Account creation because of the 40 VM limit.
+This branch uses managed disks.
