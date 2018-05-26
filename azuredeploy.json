@@ -252,7 +252,7 @@
       "scriptsToDownload": [
         "https://raw.githubusercontent.com/grandparoach/lustre_clients/managed/lustre_client.sh"
       ],
-      "commandToExecute": "[concat('bash cn-setup.sh ', variables('JumpBoxName'))]"
+      "commandToExecute": "[concat('bash lustre_client.sh ', variables('JumpBoxName'))]"
     }
   },  
 
