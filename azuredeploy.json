@@ -134,6 +134,20 @@
         "description": "SSH public key that will be included on all nodes. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X."
       }
     },
+    "filesystemName": {
+      "type": "string",
+      "defaultValue": "scratch",
+      "metadata": {
+        "description": "Name of the Lustre filesystem exposed by the Lustre MGS node"
+      }
+    },
+    "mgsIpAddress": {
+      "type": "string",
+      "defaultValue": "10.1.0.4",
+      "metadata": {
+        "description": "IP address of the Lustre MGS node"
+      }
+    },
     "existingVNetName": {
         "type": "string",
         "defaultValue": "vnet-lustre",
@@ -172,10 +186,16 @@
     "JumpBoximageReference": "[variables('computeImages')[parameters('JumpBoxImage')]]",
     "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
     "computeImages": {
-      "CentOS_6.7": {
+      "CentOS_7.4": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
-        "sku": "6.7",
+        "sku": "7.4",
+        "version": "latest"
+      },
+      "CentOS_7.3": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.3",
         "version": "latest"
       },
       "CentOS_7.2": {
@@ -194,12 +214,6 @@
         "publisher": "RedHat",
         "offer": "RHEL",
         "sku": "7.2",
-        "version": "latest"
-      },
-      "W2012R2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2012-R2-Datacenter",
         "version": "latest"
       }
     },
