@@ -10,7 +10,6 @@ fi
 
 # Shares
 SHARE_HOME=/share/home
-NFS_DATA=/share/data
 
 # User
 HPC_USER=hpcuser
@@ -31,78 +30,10 @@ install_pkgs()
 
 
 
-# Partitions all data disks attached to the VM 
-#
-setup_data_disks()
-{
-    mountPoint="$1"
-    filesystem="$2"
-    devices="$3"
-    raidDevice="$4"
-    createdPartitions=""
-
-    # Loop through and partition disks until not found
-    for disk in $devices; do
-        fdisk -l /dev/$disk || break
-        fdisk /dev/$disk << EOF
-n
-p
-1
-
-
-p
-w
-EOF
-        createdPartitions="$createdPartitions /dev/${disk}1"
-    done
-    
-    sleep 10
-
-# Create RAID-0 volume
-    if [ -n "$createdPartitions" ]; then
-        devices=`echo $createdPartitions | wc -w`
-        mdadm --create /dev/md10 --level 0 --raid-devices $devices $createdPartitions
-        mkfs -t ext4 /dev/md10
-        echo "/dev/md10 $mountPoint ext4 defaults,nofail 0 2" >> /etc/fstab
-        mount /dev/md10
-    fi
-
-#	mkfs -t $filesystem $createdPartitions
-#	echo "$createdPartitions $mountPoint $filesystem defaults,nofail 0 2" >> /etc/fstab
-	
-#	mount $createdPartitions
-}
-
-setup_disks()
+setup_nfs()
 {      
-    # Dump the current disk config for debugging
-    fdisk -l
-    
-    # Dump the scsi config
-    lsscsi
-    
-    # Get the root/OS disk so we know which device it uses and can ignore it later
-    rootDevice=`mount | grep "on / type" | awk '{print $1}' | sed 's/[0-9]//g'`
-    
-    # Get the TMP disk so we know which device and can ignore it later
-    tmpDevice=`mount | grep "on /mnt/resource type" | awk '{print $1}' | sed 's/[0-9]//g'`
-
-    # Get the data disk sizes from fdisk, we ignore the disks above
-    dataDiskSize=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | awk '{print $3}' | sort -n -r | tail -1`
-
-	# Compute number of disks
-	nbDisks=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | wc -l`
-	echo "nbDisks=$nbDisks"
-	
-	dataDevices="`fdisk -l | grep '^Disk /dev/' | grep $dataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
     
     mkdir -p $SHARE_HOME
-	mkdir -p $NFS_DATA
-	setup_data_disks $NFS_DATA "xfs" "$dataDevices" "nfsdata"
-
-    chown $HPC_USER:$HPC_GROUP $NFS_DATA
-	
-	echo "$NFS_DATA    *(rw,async)" >> /etc/exports
 
     echo "$SHARE_HOME  *(rw,async)" >> /etc/exports
     
@@ -153,15 +84,14 @@ setup_user()
 	chmod 600 $SHARE_HOME/$HPC_USER/.ssh/id_rsa
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
 	
-	# chown -R $HPC_USER:$HPC_GROUP $NFS_DATA
+	
 }
 
 
 
 install_pkgs
-setup_disks
+setup_nfs
 setup_user
 
 
 exit 0
-
