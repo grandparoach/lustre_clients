@@ -250,7 +250,7 @@
     
     "vmScripts": {
       "scriptsToDownload": [
-        "https://raw.githubusercontent.com/grandparoach/lustre_clients/managed/cn-setup.sh"
+        "https://raw.githubusercontent.com/grandparoach/lustre_clients/managed/lustre_client.sh"
       ],
       "commandToExecute": "[concat('bash cn-setup.sh ', variables('JumpBoxName'))]"
     }
