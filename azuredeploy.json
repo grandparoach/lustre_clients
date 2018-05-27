@@ -252,7 +252,7 @@
       "scriptsToDownload": [
         "https://raw.githubusercontent.com/grandparoach/lustre_clients/managed/lustre_client.sh"
       ],
-      "commandToExecute": "[concat('bash lustre_client.sh ', variables('JumpBoxName'))]"
+      "commandToExecute": "[concat('bash lustre_client.sh', ' -j ', variables('JumpBoxName'), ' -m ', parameters('mgsIpAddress'), ' -f ', parameters('filesystemName'))]"
     }
   },  
 
