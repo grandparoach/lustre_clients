@@ -13,16 +13,16 @@ sed -i 's/enforcing/disabled/g' /etc/selinux/config
 setenforce permissive
 
 # Shares
-SHARE_HOME=/share/home
+#SHARE_HOME=/share/home
 
-mkdir -p /share
-mkdir -p $SHARE_HOME
+#mkdir -p /share
+#mkdir -p $SHARE_HOME
 
 # User
-HPC_USER=hpcuser
-HPC_UID=7007
-HPC_GROUP=hpc
-HPC_GID=7007
+#HPC_USER=hpcuser
+#HPC_UID=7007
+#HPC_GROUP=hpc
+#HPC_GID=7007
 
 
 # Initialize local variables
@@ -200,8 +200,8 @@ create_client() {
 }
 
 
-mount_nfs
-setup_user
+#mount_nfs
+#setup_user
 
 install_lustre_centos_hpc_71
 create_client
