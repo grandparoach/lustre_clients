@@ -11,8 +11,9 @@
     },
     "JumpBoxVMsku": {
       "type": "string",
-      "defaultValue": "Standard_DS4_v2",
+      "defaultValue": "Standard_H16r",
       "allowedValues": [
+        "Standard_H16r",
         "Standard_DS1_v2",
         "Standard_DS2_v2",
         "Standard_DS3_v2",
@@ -30,11 +31,9 @@
     },
     "JumpBoxImage": {
       "type": "string",
-      "defaultValue": "CentOS_7.4",
+      "defaultValue": "CentOS-HPC_7.1",
       "allowedValues": [
-        "CentOS_7.2",
-        "CentOS_7.3",
-        "CentOS_7.4"
+        "CentOS-HPC_7.1"
       ],
       "metadata": {
         "description": "The VM image of the jump box node"
@@ -250,7 +249,7 @@
     
     "vmScripts": {
       "scriptsToDownload": [
-        "https://raw.githubusercontent.com/grandparoach/lustre_clients/managed/lustre_client.sh"
+        "https://raw.githubusercontent.com/grandparoach/lustre_clients/discrete/lustre_client.sh"
       ],
       "commandToExecute": "[concat('bash lustre_client.sh', ' -j ', variables('JumpBoxName'), ' -m ', parameters('mgsIpAddress'), ' -f ', parameters('filesystemName'))]"
     }
@@ -326,7 +325,7 @@
             "caching": "ReadOnly",
             "createOption": "FromImage",
              "managedDisk": {
-                "storageAccountType": "Premium_LRS"
+                "storageAccountType": "Standard_LRS"
              }
           }
         },
@@ -361,90 +360,12 @@
         "typeHandlerVersion": "2.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "fileUris": "[variables('JumpBoxvmScripts').scriptsToDownload]"
+          "fileUris": "[variables('vmScripts').scriptsToDownload]"
         },
         "protectedSettings": {
-          "commandToExecute": "[variables('JumpBoxvmScripts').commandToExecute]"
-        }
-      }
-    },
-
-
-    {
-      "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "name": "[parameters('vmPrefix')]",
-      "location": "[variables('location')]",
-      "apiVersion": "2016-04-30-preview",
-      "sku": {
-        "name": "[parameters('CompNodeVMsku')]",
-        "tier": "Standard",
-        "capacity": "[parameters('computeNodeCount')]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('JumpBoxName'),'/extensions/ext')]"
-      ],
-      "properties": {
-        "overprovision": "false",
-        "upgradePolicy": {
-          "mode": "Manual"
-        },
-        "virtualMachineProfile": {
-          "networkProfile": {
-            "networkInterfaceConfigurations": [
-              {
-                "name": "[variables('NodenicName')]",
-                "properties": {
-                  "primary": "true",
-                  "ipConfigurations": [
-                    {
-                      "name": "[variables('NodeipConfigName')]",
-                      "properties": {
-                        "subnet": {
-                            "id": "[variables('SubnetRef')]"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          "osProfile": {
-            "computerNamePrefix": "[variables('vmssnamingInfix')]",
-            "adminUsername": "[parameters('adminUserName')]",
-            "adminPassword": "[parameters('adminPassword')]",
-            "linuxConfiguration": "[variables('linuxConfiguration')]"
-          },
-          "storageProfile": {
-            "imageReference": "[variables('NodeimageReference')]",  
-            "osDisk": {
-              "caching": "ReadOnly",
-              "createOption": "FromImage",
-              "managedDisk": {
-                "storageAccountType": "Standard_LRS"
-             }
-            }
-          },
-          "extensionProfile": {
-            "extensions": [
-              {
-                "name": "installCN",
-                "properties": {
-                  "publisher": "Microsoft.Azure.Extensions",
-                  "type": "CustomScript",
-                  "typeHandlerVersion": "2.0",
-                  "autoUpgradeMinorVersion": true,
-                  "settings": {
-                    "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[variables('vmScripts').commandToExecute]"
-                  }
-                }
-              }
-            ]
-          }
+          "commandToExecute": "[variables('vmScripts').commandToExecute]"
         }
       }
     }
   ]
 }
-
